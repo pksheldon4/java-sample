@@ -14,11 +14,4 @@ public class DemoApplication {
     public static void main(String[] args) {
         SpringApplication.run(DemoApplication.class, args);
     }
-
-    @Bean
-    @ConditionalOnProperty(prefix = "management.trace.http", name = "enabled", matchIfMissing = true)
-    public HttpTraceRepository inMemoryTraceRepository() {
-        return new InMemoryHttpTraceRepository();
-    }
-
 }
