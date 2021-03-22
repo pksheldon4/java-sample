@@ -13,6 +13,6 @@ public class HelloController {
     @GetMapping(path = "/hello")
     public String hello() {
         log.info("/hello was called");
-        return "Welcome to KPack Hello";
+        return "Welcome to Java-Sample Hello";
     }
 }

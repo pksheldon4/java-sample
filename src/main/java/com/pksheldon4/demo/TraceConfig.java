@@ -33,7 +33,8 @@ public class TraceConfig {
 
         @Override
         protected boolean shouldNotFilter(HttpServletRequest request) {
-            return request.getServletPath().contains("actuator");
+            return request.getServletPath().contains("actuator") ||
+                request.getServletPath().contains("favicon.ico");
         }
     }
 }
