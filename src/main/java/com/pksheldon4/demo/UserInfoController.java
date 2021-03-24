@@ -15,8 +15,8 @@ import java.util.Map;
 public class UserInfoController {
 
     @GetMapping("/user/info")
-    public Map<String, Object> getUserInfo() {
+    public User getUserInfo() {
         PreAuthenticatedAuthenticationToken authToken = (PreAuthenticatedAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        return Collections.singletonMap("user_name", ((User) authToken.getPrincipal()).getUsername());
+        return ((User) authToken.getPrincipal());
     }
 }

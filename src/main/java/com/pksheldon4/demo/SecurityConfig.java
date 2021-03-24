@@ -1,7 +1,9 @@
 package com.pksheldon4.demo;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.context.annotation.Configuration;
@@ -21,18 +23,14 @@ import org.springframework.security.web.authentication.preauth.RequestHeaderAuth
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Configuration
 @Slf4j
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private static final String X_FORWARDED_ACCESS_TOKEN = "x-forwarded-access-token";
-    private static final String X_FORWARDED_EMAIL = "x-forwarded-email";
-    private static final List<String> IGNORED_SCOPES = Arrays.asList("openid", "api", "email");
+    private static final String X_FORWARDED_ACCESS_TOKEN = "X-Forwarded-Access-Token";
+    private static final String X_FORWARDED_EMAIL = "X-Forwarded-Email";
 
     private final ObjectMapper mapper;
 
@@ -66,9 +64,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .anyRequest().hasRole("AUTHENTICATED");
     }
 
-    /***
-     * This method instructs the Security Configuration to look for the Specific x-forward-* headers.
-     */
     private RequestHeaderAuthenticationFilter requestHeaderAuthenticationFilter() throws Exception {
         RequestHeaderAuthenticationFilter f = new RequestHeaderAuthenticationFilter();
         f.setPrincipalRequestHeader(X_FORWARDED_EMAIL);
@@ -80,9 +75,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return f;
     }
 
-    /**
-     * This method extracts, and loads the GrantedAuthorities list by converting the token "scope" details into "SCOPE_XXXX" Authorities.
-     */
     private AuthenticationDetailsSource<HttpServletRequest, PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails> authenticationDetailsSource() {
         return (request) -> new PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails(
             request,
@@ -91,29 +83,36 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private List<GrantedAuthority> getGrantedAuthoritiesFromRequest(HttpServletRequest request) {
-        String jwtToken = request.getHeader(X_FORWARDED_ACCESS_TOKEN);
-
+        String accessToken = request.getHeader(X_FORWARDED_ACCESS_TOKEN);
         List<GrantedAuthority> authorities = new ArrayList<>();
         try {
-            String[] split_string = jwtToken.split("\\.");
-            String base64EncodedBody = split_string[1];
-            String base64DecodedBody = new String(Base64.decodeBase64(base64EncodedBody));
-
-            // convert JSON string to Map
-            Map<String, Object> jsonMap = mapper.readValue(base64DecodedBody, new TypeReference<Map<String, Object>>() {
-            });
-            String scopes = (String) jsonMap.get("scope");
-            authorities = Arrays.stream(scopes.split(" ")).sequential()
-                .filter(scope -> !IGNORED_SCOPES.contains(scope))
-                .map(scope -> new SimpleGrantedAuthority("ROLE_" + scope.toUpperCase()))
-                .collect(Collectors.toList());
-
-            //Use this if you just want to ensure there's a token in the request header
-            authorities.add(new SimpleGrantedAuthority("ROLE_AUTHENTICATED"));
+            if (accessToken != null) {
+                createAuthoritiesFromToken(accessToken, authorities);
+                /**
+                 * Use this, along with "http.anyRequest().hasRole("AUTHENTICATED")" above, to ensure there's a token in the request header
+                 */
+                authorities.add(new SimpleGrantedAuthority("ROLE_AUTHENTICATED"));
+            }
         } catch (Exception ex) {
             log.error("############## {}", ex.getLocalizedMessage());
+            throw new RuntimeException(ex);
         }
         return authorities;
+    }
+
+    private void createAuthoritiesFromToken(String accessToken, List<GrantedAuthority> authorities) throws JsonProcessingException {
+        String[] split_string = accessToken.split("\\.");
+        String base64EncodedBody = split_string[1];
+        String base64DecodedBody = new String(Base64.decodeBase64(base64EncodedBody));
+        JsonNode jsonNode = mapper.readTree(base64DecodedBody);
+        ArrayNode roles = (ArrayNode) jsonNode.get("user_roles");  //This field name matches the one created in Keycloak
+        if (null != roles) {
+            log.debug("#### ROLES: {}" + roles);
+            roles.spliterator().forEachRemaining(role -> {
+                    authorities.add(new SimpleGrantedAuthority("ROLE_" + role.textValue().toUpperCase()));
+                }
+            );
+        }
     }
 
 }
