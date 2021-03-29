@@ -13,7 +13,5 @@ You can find the deployment artifacts in the `oauth2-proxy-with-keycloak` folder
 This version is a pure resource server with Keycloak as an Auth Provider. It contains a Keycloak specific Role Converter to convert Realm and/or Client roles into Granted Authorities for the User.
 Use along with [Oauth2 Gateway](https://github.com/pksheldon4/oauth2-gateway) for Oauth2 Client login and routing.
 
-
-
 #oauth2login-with-keycloak-roles
 The branch demonstrates a single application which handles the oauth2login and resource server using a custom Keycloak OAuth2UserService to convert the jwt token to ROLE GrantedAuthorities.

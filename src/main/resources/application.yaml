@@ -2,4 +2,20 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,httptrace
+        include: health,info
+  trace:
+    http:
+      enabled: false
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://keycloak.192.168.11.240.nip.io/auth/realms/demo/protocol/openid-connect/certs
+
+logging:
+  level:
+    ROOT: warn
+    org.springframework.security: debug
+    com.pksheldon4: debug
