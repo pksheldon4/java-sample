@@ -6,6 +6,7 @@ spring:
       client:
         provider:
           keycloak:
+            issuer-uri: ${authserverUri}/auth/realms/demo
             authorization-uri: ${authserverUri}/auth/realms/demo/protocol/openid-connect/auth
             token-uri: ${authserverUri}/auth/realms/demo/protocol/openid-connect/token
             user-info-uri: ${authserverUri}/auth/realms/demo/protocol/openid-connect/userinfo
@@ -17,7 +18,7 @@ spring:
             client-secret: e712ef31-29c6-48f4-bc47-d98da0248b5e
             authorization-grant-type: authorization_code
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-            scope: api,profile
+            scope: openid,api,profile,read,write
 server:
   port: ${SERVER_PORT:8001}
 
@@ -26,9 +27,3 @@ logging:
     ROOT: info
     org.springframework.security: trace
     com.pksheldon4: debug
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,httptrace

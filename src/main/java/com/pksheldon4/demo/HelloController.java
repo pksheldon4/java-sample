@@ -11,6 +11,12 @@ public class HelloController {
     @GetMapping(path = "/hello")
     public String hello() {
         log.info("/hello was called");
-        return "Welcome to KPack Hello";
+        return "Welcome to Hello";
+    }
+
+    @GetMapping(path = "/hellowrite")
+    public String hellowrite() {
+        log.info("/hellowrite was called");
+        return "Hello Write";
     }
 }
