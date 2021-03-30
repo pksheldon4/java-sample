@@ -6,6 +6,7 @@ spring:
       client:
         provider:
           keycloak:
+            issuer-uri: ${authserverUri}/auth/realms/demo
             authorization-uri: ${authserverUri}/auth/realms/demo/protocol/openid-connect/auth
             token-uri: ${authserverUri}/auth/realms/demo/protocol/openid-connect/token
             user-info-uri: ${authserverUri}/auth/realms/demo/protocol/openid-connect/userinfo

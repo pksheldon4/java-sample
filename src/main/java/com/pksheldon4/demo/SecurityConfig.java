@@ -8,7 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
 
 @Configuration
 @EnableWebSecurity
@@ -26,7 +26,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors()
             .and()
             .authorizeRequests()
-            .antMatchers(HttpMethod.GET, "/hello").hasAnyRole("readme", "clientread")
+            .antMatchers(HttpMethod.GET, "/hello").hasAuthority("SCOPE_read")
+            .antMatchers(HttpMethod.GET, "/hellowrite").hasAuthority("SCOPE_write")
             .anyRequest().authenticated()
             .and()
             .oauth2Login()
@@ -35,7 +36,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
     JwtDecoder jwtDecoder(OAuth2ClientProperties auth2ClientProperties) {
-        String uri = auth2ClientProperties.getProvider().get("keycloak").getJwkSetUri();
-        return NimbusJwtDecoder.withJwkSetUri(uri).build();
+        String uri = auth2ClientProperties.getProvider().get("keycloak").getIssuerUri();
+        return JwtDecoders.fromIssuerLocation(uri);
     }
 }
