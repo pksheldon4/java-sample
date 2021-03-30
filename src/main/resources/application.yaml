@@ -1,12 +1,3 @@
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info
-  trace:
-    http:
-      enabled: false
-
 spring:
   security:
     oauth2:

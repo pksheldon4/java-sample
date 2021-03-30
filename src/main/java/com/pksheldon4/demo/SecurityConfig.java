@@ -18,7 +18,8 @@ public class SecurityConfig {
         http
             .authorizeRequests((authz) -> authz
                 .antMatchers("/actuator/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/hello").hasAnyRole("readme", "clientread")
+                .antMatchers(HttpMethod.GET, "/hello").hasAuthority("SCOPE_read")
+                .antMatchers(HttpMethod.GET, "/hellowrite").hasAuthority("SCOPE_")
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer((oauth2) -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))

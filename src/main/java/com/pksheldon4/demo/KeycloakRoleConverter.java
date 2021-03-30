@@ -36,12 +36,14 @@ public class KeycloakRoleConverter implements Converter<Jwt, Collection<GrantedA
 
     private Collection<GrantedAuthority> realmRoleAuthorities(Jwt jwt) {
 
-        final Map<String, Object> realmAccess = (Map<String, Object>) jwt.getClaims().get("realm_access");
-        if (realmAccess != null && realmAccess.containsKey("roles")) {
-            return ((List<String>) realmAccess.get("roles")).stream()
-                .map(roleName -> "ROLE_" + roleName) // prefix to map to a Spring Security "role"
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toSet());
+        if (jwt.containsClaim("realmAccess")) {
+            final Map<String, Object> realmAccess = (Map<String, Object>) jwt.getClaims().get("realm_access");
+            if (realmAccess.containsKey("roles")) {
+                return ((List<String>) realmAccess.get("roles")).stream()
+                    .map(roleName -> "ROLE_" + roleName) // prefix to map to a Spring Security "role"
+                    .map(SimpleGrantedAuthority::new)
+                    .collect(Collectors.toSet());
+            }
         }
         return new HashSet<>();
     }
@@ -49,12 +51,14 @@ public class KeycloakRoleConverter implements Converter<Jwt, Collection<GrantedA
     private Collection<GrantedAuthority> clientRoleAuthorities(Jwt jwt) {
         final String clientId = (String) jwt.getClaims().get("azp"); //Client Name from Keycloak
 
-        final Map<String, Object> clientAccess = (Map<String, Object>) ((Map<String, Object>) jwt.getClaims().get("resource_access")).get(clientId);
-        if (clientAccess != null && clientAccess.containsKey("roles")) {
-            return ((List<String>) clientAccess.get("roles")).stream()
-                .map(roleName -> "ROLE_" + roleName) // prefix to map to a Spring Security "role"
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toSet());
+        if (jwt.containsClaim("resourceAccess")) {
+            final Map<String, Object> clientAccess = (Map<String, Object>) ((Map<String, Object>) jwt.getClaims().get("resource_access")).get(clientId);
+            if (clientAccess != null && clientAccess.containsKey("roles")) {
+                return ((List<String>) clientAccess.get("roles")).stream()
+                    .map(roleName -> "ROLE_" + roleName) // prefix to map to a Spring Security "role"
+                    .map(SimpleGrantedAuthority::new)
+                    .collect(Collectors.toSet());
+            }
         }
         return new HashSet<>();
     }
