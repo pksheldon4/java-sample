@@ -63,6 +63,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
             // /hello and /user/info require READ scope/role
             .antMatchers(HttpMethod.GET, "/hello").hasAnyAuthority("SCOPE_read")
+            .antMatchers(HttpMethod.GET, "/hellowrite").hasAnyAuthority("SCOPE_write")
             //This is an example of a invalid request, when the scope/role doesn't exist
             .antMatchers(HttpMethod.GET, "/invalid").hasAuthority("SCOPE_invalid")
             //This requires that any request at least have had an x-forwarded-access-token in the header
