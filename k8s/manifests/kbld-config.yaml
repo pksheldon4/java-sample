@@ -1,0 +1,8 @@
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: Config
+minimumRequiredVersion: 0.24.0
+overrides:
+  - image: sample-app-image
+    newImage: pksheldon4/java-sample:gov
+    preresolved: false

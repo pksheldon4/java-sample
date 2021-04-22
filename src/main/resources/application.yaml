@@ -1,27 +1,5 @@
-authserverUri: ${AUTHSERVER_URI:http://keycloak.192.168.11.240.nip.io}
-
-spring:
-  security:
-    oauth2:
-      client:
-        provider:
-          keycloak:
-            issuer-uri: ${authserverUri}/auth/realms/demo
-            authorization-uri: ${authserverUri}/auth/realms/demo/protocol/openid-connect/auth
-            token-uri: ${authserverUri}/auth/realms/demo/protocol/openid-connect/token
-            user-info-uri: ${authserverUri}/auth/realms/demo/protocol/openid-connect/userinfo
-            jwk-set-uri: ${authserverUri}/auth/realms/demo/protocol/openid-connect/certs
-            user-name-attribute: preferred_username
-        registration:
-          keycloak:
-            client-id: login-app
-            client-secret: e712ef31-29c6-48f4-bc47-d98da0248b5e
-            authorization-grant-type: authorization_code
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-            scope: openid,api,profile,read,write
 server:
-  port: ${SERVER_PORT:8001}
-
+  port: 8080
 logging:
   level:
     ROOT: info

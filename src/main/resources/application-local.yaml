@@ -1,0 +1,12 @@
+server:
+  ssl:
+    key-store-type: PKCS12
+    key-store: classpath:keystore/java-sample.p12
+    key-store-password: 2ze7R0PES9I88AQkrwvbudu5j
+    enabled: true
+  port: 8443
+logging:
+  level:
+    ROOT: info
+    org.springframework.security: trace
+    com.pksheldon4: debug

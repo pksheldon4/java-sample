@@ -1,0 +1,94 @@
+#@ load("@ytt:data", "data")
+#@ load("@ytt:base64", "base64")
+#@ load("@ytt:yaml", "yaml")
+
+#@ def labels():
+app: sample-app
+heritage: kapp
+#@ end
+
+#@ def namespace():
+#@ return "default"
+#@ end
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels: #@ labels()
+  name: sample-app-sa
+  namespace: #@ namespace()
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels: #@ labels()
+  name: sample-app
+  namespace: #@ namespace()
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector: #@ labels()
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels: #@ labels()
+  name: jwt-private-key
+  namespace: #@ namespace()
+  annotations:
+    kapp.k14s.io/versioned: ""
+data:
+  private.key: #@ data.values.authPrivateKey
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels: #@ labels()
+  name: sample-app
+  namespace: #@ namespace()
+spec:
+  replicas: 1
+  selector:
+    matchLabels: #@ labels()
+  template:
+    metadata:
+      labels: #@ labels()
+    spec:
+      serviceAccountName: sample-app-sa
+      containers:
+        - name: sample-app
+          image: sample-app-image
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "logingov"
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            runAsUser: 1000
+            runAsGroup: 100
+      tolerations: [ ]
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: sample-app
+  labels: #@ labels()
+  namespace: #@ namespace()
+spec:
+  virtualhost:
+    fqdn: #@ data.values.fqdn
+    tls:
+      secretName: #@ data.values.certSecretName
+  routes:
+    - services:
+        - name: sample-app
+          port: 80

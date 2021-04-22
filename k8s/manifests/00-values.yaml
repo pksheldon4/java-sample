@@ -1,0 +1,6 @@
+#@data/values
+---
+fqdn: sample.pksbeachhouse.com
+certSecretName: tls-secret
+authPrivateKey: |
+
