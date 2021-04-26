@@ -5,8 +5,3 @@ server:
     key-store-password: 2ze7R0PES9I88AQkrwvbudu5j
     enabled: true
   port: 8443
-logging:
-  level:
-    ROOT: info
-    org.springframework.security: trace
-    com.pksheldon4: debug
