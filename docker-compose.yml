@@ -1,0 +1,19 @@
+version: "3.7"
+
+services:
+  keycloak:
+    container_name: keycloak
+    image: jboss/keycloak:12.0.1
+    restart: always
+    command: -Dkeycloak.profile.feature.upload_scripts=enabled
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: password
+      KEYCLOAK_IMPORT: /tmp/sample-realm.json
+      DB_VENDOR: h2
+    volumes:
+      - ./keycloak-db:/opt/jboss/keycloak/standalone/data
+      - ./sample-realm.json:/tmp/sample-realm.json
+    ports:
+      - 9000:8080
+#      - 8443:8443

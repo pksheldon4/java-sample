@@ -1,4 +1,4 @@
-authserverUri: ${AUTHSERVER_URI:http://keycloak.192.168.11.240.nip.io}
+authserverUri: ${AUTHSERVER_URI:http://localhost:9000}
 
 spring:
   security:
@@ -6,11 +6,11 @@ spring:
       client:
         provider:
           keycloak:
-            issuer-uri: ${authserverUri}/auth/realms/demo
-            authorization-uri: ${authserverUri}/auth/realms/demo/protocol/openid-connect/auth
-            token-uri: ${authserverUri}/auth/realms/demo/protocol/openid-connect/token
-            user-info-uri: ${authserverUri}/auth/realms/demo/protocol/openid-connect/userinfo
-            jwk-set-uri: ${authserverUri}/auth/realms/demo/protocol/openid-connect/certs
+            issuer-uri: ${authserverUri}/auth/realms/sample
+            authorization-uri: ${authserverUri}/auth/realms/sample/protocol/openid-connect/auth
+            token-uri: ${authserverUri}/auth/realms/sample/protocol/openid-connect/token
+            user-info-uri: ${authserverUri}/auth/realms/sample/protocol/openid-connect/userinfo
+            jwk-set-uri: ${authserverUri}/auth/realms/sample/protocol/openid-connect/certs
             user-name-attribute: preferred_username
         registration:
           keycloak:
