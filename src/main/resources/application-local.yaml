@@ -1,7 +1,17 @@
 server:
+  servlet:
+    session:
+      cookie:
+        secure: true
+        http-only: true
+        max-age: 18h
+      tracking-modes: COOKIE # Default but explicitly calling it out for STIG
+      timeout: 18h
   ssl:
     key-store-type: PKCS12
     key-store: classpath:keystore/java-sample.p12
     key-store-password: 2ze7R0PES9I88AQkrwvbudu5j
     enabled: true
   port: 8443
+  http:
+    port: 8080L::
